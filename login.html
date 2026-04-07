@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>brat auth</title>
+    <style>
+        body {
+            background-color: #8ace00;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .auth-container {
+            background-color: black;
+            color: white;
+            padding: 40px;
+            border: 4px solid black;
+            width: 350px;
+            text-align: center;
+        }
+
+        .auth-title {
+            font-size: 30px;
+            margin-bottom: 30px;
+            color: #8ace00;
+            text-transform: lowercase;
+            font-style: italic;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            box-sizing: border-box;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #8ace00;
+            color: black;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .auth-btn:hover {
+            background-color: white;
+        }
+
+        .toggle-text {
+            font-size: 12px;
+            color: #8ace00;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container" id="login-box">
+        <div class="auth-title">brat login</div>
+        <input type="text" id="login-id" class="auth-input" placeholder="ID">
+        <input type="password" id="login-pw" class="auth-input" placeholder="PASSWORD">
+        <button class="auth-btn" onclick="handleLogin()">ENTER</button>
+        <div class="toggle-text" onclick="toggleAuth()">계정이 없으면 회원가입 해</div>
+    </div>
+    <div class="auth-container" id="signup-box" style="display: none;">
+        <div class="auth-title">brat signup</div>
+        <input type="text" id="signup-id" class="auth-input" placeholder="NEW ID">
+        <input type="password" id="signup-pw" class="auth-input" placeholder="NEW PASSWORD">
+        <button class="auth-btn" onclick="handleSignup()">CREATE</button>
+        <div class="toggle-text" onclick="toggleAuth()">이미 회원이면 로그인 해</div>
+    </div>
+    <script>
+        function toggleAuth() {
+            const lBox = document.getElementById('login-box');
+            const sBox = document.getElementById('signup-box');
+            lBox.style.display = lBox.style.display === 'none' ? 'block' : 'none';
+            sBox.style.display = sBox.style.display === 'none' ? 'block' : 'none';
+        }
+        function handleSignup() {
+            const id = document.getElementById('signup-id').value;
+            const pw = document.getElementById('signup-pw').value;
+            if (!id || !pw) return alert("빈칸을 다 채워줘! Very un-brat of you.");
+            let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
+            if (users[id]) return alert("이미 사용 중인 아이디야.");
+            users[id] = pw;
+            localStorage.setItem('bratUsers', JSON.stringify(users));
+            alert("회원가입 완료! 이제 로그인 해.");
+            toggleAuth();
+        }
+        function handleLogin() {
+            const id = document.getElementById('login-id').value;
+            const pw = document.getElementById('login-pw').value;
+            let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
+            if (users[id] && users[id] === pw) {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', id);
+                alert(`${id}님, brat 세계에 오신 걸 환영합니다.`);
+                location.href = "./index.html";
+            } else { alert("아이디나 비밀번호가 틀렸어."); }
+        }
+    </script>
+</body>
+
+</html>
