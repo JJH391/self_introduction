@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <li><a href="./projects.html">Projects</a></li>
                 <li><a href="./board.html">Board</a></li>
             </ul>
-            <div class="nav-right"></div> </div>
+            <div id="login-menu" class="nav-login"></div>
+        </div>
     </nav>
     <style>
         .navbar { background-color: black; position: fixed; top: 0; left: 0; width: 100%; height: 60px; z-index: 1000; display: flex; align-items: center; }
@@ -19,7 +20,31 @@ document.addEventListener('DOMContentLoaded', () => {
         .nav-links li { margin: 0 25px; }
         .navbar a { color: white; text-decoration: none; font-size: 18px; transition: 0.3s; font-weight: bold; }
         .navbar a:hover { color: #8ace00; }
+        .nav-login { display: flex; justify-content: flex-end; }
+        .nav-login a { font-size: 16px; border: 1px solid #8ace00; padding: 5px 12px; border-radius: 4px; }
     </style>
     `;
+
     document.body.insertAdjacentHTML('afterbegin', navbarHTML);
+    checkLoginStatus();
 });
+
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const loginMenu = document.getElementById('login-menu');
+
+    if (isLoggedIn === 'true') {
+        const userId = localStorage.getItem('userId');
+        loginMenu.innerHTML = `<a href="#" onclick="logout()">${userId} (Logout)</a>`;
+    } else {
+        loginMenu.innerHTML = `<a href="./login.html">Login</a>`;
+    }
+}
+
+function logout() {
+    if (confirm("로그아웃 할 거야?")) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userId');
+        location.href = "./index.html";
+    }
+}

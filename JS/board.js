@@ -1,7 +1,12 @@
 // JS/board.js
 document.addEventListener('DOMContentLoaded', () => {
     loadPosts();
-    // 로그인 체크 및 readOnly 기능 잠시 제거
+    const currentId = localStorage.getItem('userId');
+    if (currentId) {
+        const authorInput = document.getElementById('post-author');
+        authorInput.value = currentId;
+        authorInput.readOnly = true; // 로그인 시 본인 아이디 고정
+    }
 });
 
 function loadPosts() {
@@ -17,7 +22,9 @@ function loadPosts() {
 }
 
 function addPost() {
-    // 로그인 체크 기능 제거
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+        alert("로그인을 먼저 해야 글을 쓸 수 있어!"); return;
+    }
     const titleInput = document.getElementById('post-title');
     const authorInput = document.getElementById('post-author');
 
@@ -31,11 +38,10 @@ function addPost() {
     let posts = JSON.parse(localStorage.getItem('bratPosts')) || [];
     const today = new Date().toISOString().split('T')[0];
     posts.unshift({ id: 0, title: titleInput.value, author: authorInput.value, date: today });
-    
+
     posts = reorderPosts(posts);
     localStorage.setItem('bratPosts', JSON.stringify(posts));
     titleInput.value = '';
-    authorInput.value = ''; // 작성자 칸도 비워줌
     renderTable(posts);
 }
 
@@ -47,15 +53,15 @@ function reorderPosts(posts) {
 
 function renderTable(posts) {
     const boardBody = document.getElementById('board-body');
+    const currentUserId = localStorage.getItem('userId');
     boardBody.innerHTML = '';
 
     posts.forEach((post, index) => {
-        const isDefault = (post.id === 1 || post.id === 2) && (post.author === "정지훈" || post.author === "익명");
-        
-        // 누구나 수정할 수 있도록 조건 변경
-        const titleStyle = isDefault ? "text-align: left;" : "text-align: left; cursor: pointer; text-decoration: underline;";
-        const clickEvent = isDefault ? "" : `onclick="editPost(${index})"`;
-        const editIcon = isDefault ? "" : " ✏️";
+        const isDefault = (post.id === 1 || post.id === 2);
+        const isMyPost = post.author === currentUserId && !isDefault;
+        const titleStyle = isMyPost ? "text-align: left; cursor: pointer; text-decoration: underline;" : "text-align: left;";
+        const clickEvent = isMyPost ? `onclick="editPost(${index})"` : "";
+        const editIcon = isMyPost ? " ✏️" : "";
 
         boardBody.innerHTML += `<tr><td>${post.id}</td><td style="${titleStyle}" ${clickEvent}>${post.title}${editIcon}</td><td>${post.author}</td><td>${post.date}</td></tr>`;
     });
@@ -63,8 +69,9 @@ function renderTable(posts) {
 
 function editPost(index) {
     let posts = JSON.parse(localStorage.getItem('bratPosts')) || [];
-    // 본인 확인 로직 제거
-    
+    const currentUserId = localStorage.getItem('userId');
+    if (posts[index].author !== currentUserId) { alert("네 글이 아니면 고칠 수 없어!"); return; }
+
     const newTitle = prompt("뭐라고 고칠 거야? (100자 이내)", posts[index].title);
     if (newTitle === null) return;
     if (newTitle.trim() === "") { alert("내용을 비워둘 순 없어!"); return; }
@@ -77,13 +84,13 @@ function editPost(index) {
 
 function deleteLastPost() {
     let posts = JSON.parse(localStorage.getItem('bratPosts')) || [];
-    // 내 글 찾기 로직 대신, 단순히 '맨 위의 일반 글'을 삭제함
-    const lastPostIndex = posts.findIndex(post => post.id > 2);
+    const currentUserId = localStorage.getItem('userId');
+    const myLastPostIndex = posts.findIndex(post => post.author === currentUserId && post.id > 2);
 
-    if (lastPostIndex === -1) { alert("삭제할 수 있는 글이 없어! (기본 공지사항은 제외)"); return; }
+    if (myLastPostIndex === -1) { alert("삭제할 수 있는 네 글이 없어! (기본 공지사항은 제외)"); return; }
 
-    if (confirm("가장 최근에 작성된 글을 지울 거야?")) {
-        posts.splice(lastPostIndex, 1);
+    if (confirm("네가 쓴 최신 글을 지울 거야?")) {
+        posts.splice(myLastPostIndex, 1);
         posts = reorderPosts(posts);
         localStorage.setItem('bratPosts', JSON.stringify(posts));
         renderTable(posts);
@@ -91,9 +98,11 @@ function deleteLastPost() {
 }
 
 function clearBoard() {
-    if (confirm("일반 글을 전부 지울 거야? (기본글은 유지돼!)")) {
+    const currentUserId = localStorage.getItem('userId');
+    if (!currentUserId) return alert("로그인부터 해!");
+    if (confirm("내가 쓴 글만 전부 지울 거야? (기본글은 유지돼!)")) {
         let posts = JSON.parse(localStorage.getItem('bratPosts')) || [];
-        const filteredPosts = posts.filter(post => post.id <= 2);
+        const filteredPosts = posts.filter(post => post.author !== currentUserId || post.id <= 2);
         const finalPosts = reorderPosts(filteredPosts);
         localStorage.setItem('bratPosts', JSON.stringify(finalPosts));
         renderTable(finalPosts);
