@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>brat ADMIN - 권한 관리</title>
+    <style>
+        body {
+            background-image: url('./imgs/brat.png');
+            background-color: #8ace00;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding-top: 100px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 30px;
+            border: 5px solid black;
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .user-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-promote {
+            background-color: #8ace00;
+            color: black;
+        }
+
+        .btn-demote {
+            background-color: #ffae00;
+            color: black;
+        }
+
+        .btn-delete {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .btn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #8ace00;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="color: #8ace00; font-style: italic;">USER MANAGEMENT</h1>
+        <p style="font-size: 14px; color: #ccc;">
+            관리자 권한 부여/취소는 <span style="color:#8ace00;">MASTER(jjh)</span>만 가능합니다.<br>
+            일반 관리자는 다른 관리자를 삭제할 수 없습니다.
+        </p>
+
+        <ul id="user-list" class="user-list">
+        </ul>
+
+        <a href="./board.html" class="back-link">← Back to Board</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const isAdmin = localStorage.getItem('isAdmin') === 'true';
+            if (!isAdmin) {
+                alert("관리자만 접근 가능해!");
+                location.href = "./index.html";
+                return;
+            }
+            renderUsers();
+        });
+
+        function renderUsers() {
+            const userList = document.getElementById('user-list');
+            const users = JSON.parse(localStorage.getItem('bratUsers')) || {};
+            const currentUserId = localStorage.getItem('userId');
+            const isSuperAdmin = localStorage.getItem('isSuperAdmin') === 'true'; // jjh 여부 확인
+
+            userList.innerHTML = '';
+
+            Object.keys(users).forEach(id => {
+                // 자기 자신은 목록에서 제외
+                if (id === currentUserId) return;
+
+                const user = users[id];
+                const li = document.createElement('li');
+                li.className = 'user-item';
+
+                // 권한 체크 로직
+                const isTargetAdmin = (user.role === 'admin' || id === 'jjh');
+
+                // 1. 관리자 부여/취소는 오직 SuperAdmin(jjh)만 가능
+                const canChangeRole = isSuperAdmin;
+
+                // 2. 계정 삭제는 SuperAdmin이거나, 대상이 일반 유저일 때만 가능 (어드민끼리 삭제 방지)
+                const canDelete = isSuperAdmin || !isTargetAdmin;
+
+                let actionButtons = '';
+                if (user.role === 'admin') {
+                    actionButtons = `<button class="btn btn-demote" onclick="demoteAdmin('${id}')" ${!canChangeRole ? 'disabled' : ''}>관리자 취소</button>`;
+                } else {
+                    actionButtons = `<button class="btn btn-promote" onclick="promoteAdmin('${id}')" ${!canChangeRole ? 'disabled' : ''}>관리자 부여</button>`;
+                }
+
+                li.innerHTML = `
+                    <span>${id} [${user.role.toUpperCase()}]</span>
+                    <div class="user-btns">
+                        ${actionButtons}
+                        <button class="btn btn-delete" onclick="deleteUser('${id}')" ${!canDelete ? 'disabled' : ''}>계정 삭제</button>
+                    </div>
+                `;
+                userList.appendChild(li);
+            });
+        }
+
+        function promoteAdmin(id) {
+            // 한 번 더 보안 체크
+            if (localStorage.getItem('isSuperAdmin') !== 'true') return alert("권한이 없어!");
+
+            if (confirm(`${id}에게 관리자 권한을 줄 거야?`)) {
+                let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
+                if (users[id]) {
+                    users[id].role = 'admin';
+                    localStorage.setItem('bratUsers', JSON.stringify(users));
+                    renderUsers();
+                }
+            }
+        }
+
+        function demoteAdmin(id) {
+            // 한 번 더 보안 체크
+            if (localStorage.getItem('isSuperAdmin') !== 'true') return alert("권한이 없어!");
+
+            if (confirm(`${id}의 관리자 권한을 취소할 거야?`)) {
+                let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
+                if (users[id]) {
+                    users[id].role = 'user';
+                    localStorage.setItem('bratUsers', JSON.stringify(users));
+                    renderUsers();
+                }
+            }
+        }
+
+        function deleteUser(id) {
+            if (confirm(`${id}를 삭제할 거야? 작성한 글도 모두 사라져!`)) {
+                let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
+                delete users[id];
+                localStorage.setItem('bratUsers', JSON.stringify(users));
+
+                let posts = JSON.parse(localStorage.getItem('bratPosts')) || [];
+                const updatedPosts = posts.filter(post => {
+                    const pureAuthor = post.author.replace("(ADMIN)", "");
+                    return pureAuthor !== id;
+                });
+
+                const reorderedPosts = updatedPosts.slice().reverse().map((post, index) => ({
+                    ...post,
+                    id: index + 1
+                })).reverse();
+
+                localStorage.setItem('bratPosts', JSON.stringify(reorderedPosts));
+
+                alert(`${id} 계정이 삭제되었어.`);
+                renderUsers();
+            }
+        }
+    </script>
+</body>
+
+</html>

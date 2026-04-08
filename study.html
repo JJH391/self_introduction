@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>정지훈의 brat - Study</title>
+    <style>
+        body {
+            background-color: #8ace00;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 50px;
+            border: 5px solid black;
+            box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .sub-title {
+            color: #8ace00;
+            font-size: 18px;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            color: #8ace00;
+            text-transform: uppercase;
+            font-style: italic;
+            font-size: 45px;
+            margin-bottom: 50px;
+            margin-top: 0;
+        }
+
+        .competency-wrapper {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .circle-item {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .circle-item:hover {
+            transform: scale(1.05);
+        }
+
+        .circle-chart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .circle-chart__background {
+            fill: none;
+            stroke: #333;
+            stroke-width: 2;
+        }
+
+        .circle-chart__circle {
+            fill: none;
+            stroke: #8ace00;
+            stroke-width: 3;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            transition: stroke-dasharray 0.8s ease-in-out;
+        }
+
+        .circle-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .percent-text {
+            font-size: 28px;
+            color: #8ace00;
+            display: block;
+        }
+
+        .skill-name {
+            font-size: 14px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .input-group {
+            margin-top: 50px;
+            border-top: 2px solid #333;
+            padding-top: 30px;
+            display: none;
+        }
+
+        input,
+        select,
+        button {
+            padding: 12px;
+            font-weight: bold;
+            border: 2px solid #8ace00;
+            margin: 5px;
+            background: black;
+            color: white;
+        }
+
+        .study-btn {
+            background: #8ace00;
+            color: black;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <p class="sub-title">MANAGER'S ABILITY</p>
+        <h1>주인장 공부 역량</h1>
+
+        <div class="competency-wrapper">
+            <div class="circle-item" onclick="location.href='./study_detail.html?type=html'">
+                <svg class="circle-chart" viewBox="0 0 36 36">
+                    <path class="circle-chart__background"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="bar-html" class="circle-chart__circle" stroke-dasharray="0, 100"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="circle-info"><span id="text-html" class="percent-text">10%</span><span
+                        class="skill-name">HTML / CSS</span></div>
+            </div>
+            <div class="circle-item" onclick="location.href='./study_detail.html?type=js'">
+                <svg class="circle-chart" viewBox="0 0 36 36">
+                    <path class="circle-chart__background"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="bar-js" class="circle-chart__circle" stroke-dasharray="0, 100"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="circle-info"><span id="text-js" class="percent-text">10%</span><span
+                        class="skill-name">JavaScript</span></div>
+            </div>
+            <div class="circle-item" onclick="location.href='./study_detail.html?type=typing'">
+                <svg class="circle-chart" viewBox="0 0 36 36">
+                    <path class="circle-chart__background"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="bar-typing" class="circle-chart__circle" stroke-dasharray="0, 100"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="circle-info"><span id="text-typing" class="percent-text">10%</span><span
+                        class="skill-name">Typing</span></div>
+            </div>
+            <div class="circle-item" onclick="location.href='./study_detail.html?type=comm'">
+                <svg class="circle-chart" viewBox="0 0 36 36">
+                    <path class="circle-chart__background"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="bar-comm" class="circle-chart__circle" stroke-dasharray="0, 100"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="circle-info"><span id="text-comm" class="percent-text">10%</span><span
+                        class="skill-name">Comm.</span></div>
+            </div>
+        </div>
+
+        <div id="admin-only-input" class="input-group">
+            <p style="color: #8ace00;">[ MASTER ONLY: 학습 내용을 기반으로 역량이 업데이트됩니다 ]</p>
+            <select id="skill-select">
+                <option value="html">HTML / CSS</option>
+                <option value="js">JavaScript</option>
+                <option value="typing">Typing</option>
+                <option value="comm">Communication</option>
+            </select>
+            <input type="text" id="study-topic" placeholder="오늘 무엇을 공부했나요?" style="width: 250px;">
+            <button class="study-btn" onclick="checkAndAdd()">UPDATE</button>
+        </div>
+    </div>
+
+    <script src="JS/navbar.js"></script>
+    <script>
+        if (localStorage.getItem('userId') === 'jjh') document.getElementById('admin-only-input').style.display = 'block';
+
+        // 기본값을 10으로 설정
+        let mySkills = JSON.parse(localStorage.getItem('jjhSkills_vFinal')) || { html: 10, js: 10, typing: 10, comm: 10 };
+
+        function updateDisplay() {
+            Object.keys(mySkills).forEach(key => {
+                document.getElementById(`bar-${key}`).setAttribute('stroke-dasharray', `${mySkills[key]}, 100`);
+                document.getElementById(`text-${key}`).innerText = `${mySkills[key]}%`;
+            });
+            localStorage.setItem('jjhSkills_vFinal', JSON.stringify(mySkills));
+        }
+
+        function checkAndAdd() {
+            const skill = document.getElementById('skill-select').value;
+            const topic = document.getElementById('study-topic').value;
+            if (!topic.trim()) return alert("내용을 입력해줘!");
+
+            const dictionary = {
+                html: ['태그', 'tag', 'css', '스타일', 'html', '레이아웃', 'div', 'flex', 'grid', '속성', '반응형'],
+                js: ['함수', '변수', '이벤트', 'script', 'js', '기능', '클릭', '데이터', '로직', 'api', 'json', 'fetch'],
+                typing: ['타자', '속도', '연습', 'typing', '키보드', '정확도', '영타', '한타', '오타', 'wpm'],
+                comm: ['소통', '발표', '협업', '대화', '팀워크', 'communication', '회의', '경청', '피드백']
+            };
+
+            const isRelated = dictionary[skill].some(kw => topic.toLowerCase().includes(kw));
+            if (!isRelated) return alert(`[분석 실패] ${skill.toUpperCase()}와 관련이 없어 보여!`);
+
+            let points = topic.length > 30 ? 5 : (topic.length > 10 ? 3 : 1);
+            if (mySkills[skill] >= 100) return alert("이미 마스터했습니다!");
+
+            mySkills[skill] = Math.min(100, mySkills[skill] + points);
+
+            let studyLogs = JSON.parse(localStorage.getItem('jjhStudyLogs')) || { html: [], js: [], typing: [], comm: [] };
+            studyLogs[skill].push({ content: topic, date: new Date().toLocaleString(), points: points });
+            localStorage.setItem('jjhStudyLogs', JSON.stringify(studyLogs));
+
+            alert(`${points}% 상승! 공부 내용이 기록되었습니다. 🍏`);
+            document.getElementById('study-topic').value = '';
+            updateDisplay();
+        }
+        updateDisplay();
+    </script>
+</body>
+
+</html>

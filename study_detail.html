@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Study Detail - Feedback</title>
+    <style>
+        body {
+            background-color: #8ace00;
+            margin: 0;
+            padding-top: 100px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 40px;
+            border: 5px solid black;
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #8ace00;
+            text-transform: uppercase;
+            border-bottom: 3px solid #8ace00;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .log-item {
+            background: #111;
+            border-left: 5px solid #8ace00;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+        }
+
+        .log-date {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .admin-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: none;
+            gap: 5px;
+        }
+
+        .edit-btn {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .del-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .feedback-section {
+            margin-top: 50px;
+            border-top: 1px solid #333;
+            padding-top: 30px;
+        }
+
+        .comment-input {
+            width: 75%;
+            padding: 12px;
+            background: black;
+            color: white;
+            border: 2px solid #8ace00;
+        }
+
+        .comment-btn {
+            padding: 12px 20px;
+            background: #8ace00;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .comment-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .comment-item {
+            border-bottom: 1px solid #222;
+            padding: 15px 0;
+            font-size: 16px;
+        }
+
+        .comment-user {
+            color: #8ace00;
+            margin-right: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="./study.html" class="back-link">← BACK TO LIST</a>
+        <h1 id="detail-title">STUDY LOG</h1>
+        <div id="log-container"></div>
+
+        <div class="feedback-section">
+            <h3 style="color: #8ace00; text-align: left;">FEEDBACK</h3>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="comment-text" class="comment-input" placeholder="피드백을 남겨주세요!">
+                <button class="comment-btn" onclick="addComment()">SEND</button>
+            </div>
+            <ul id="comment-list" class="comment-list"></ul>
+        </div>
+    </div>
+
+    <script src="JS/navbar.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type') || 'html';
+        const isMaster = localStorage.getItem('userId') === 'jjh';
+        document.getElementById('detail-title').innerText = type.toUpperCase() + " STUDY LOG";
+
+        function renderAll() {
+            const logs = JSON.parse(localStorage.getItem('jjhStudyLogs')) || {};
+            const logContainer = document.getElementById('log-container');
+
+            logContainer.innerHTML = (logs[type] || []).map((log, index) => `
+                <div class="log-item">
+                    <div class="log-date">${log.date} (성장도: +${log.points}%)</div>
+                    <div id="log-text-${index}" style="font-size: 18px;">${log.content}</div>
+                    <div class="admin-controls" style="display: ${isMaster ? 'flex' : 'none'}">
+                        <button class="edit-btn" onclick="editLog(${index})">EDIT</button>
+                        <button class="del-btn" onclick="deleteLog(${index})">DEL</button>
+                    </div>
+                </div>
+            `).reverse().join('') || "<p style='color:#555;'>기록된 공부 내용이 없습니다.</p>";
+
+            const feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks')) || {};
+            const commentList = document.getElementById('comment-list');
+            commentList.innerHTML = (feedbacks[type] || []).map(f => `<li class="comment-item"><span class="comment-user">[${f.user}]</span> ${f.text}</li>`).reverse().join('');
+        }
+
+        function editLog(index) {
+            let logs = JSON.parse(localStorage.getItem('jjhStudyLogs'));
+            const newContent = prompt("내용을 수정하세요:", logs[type][index].content);
+            if (newContent && newContent.trim() !== "") {
+                logs[type][index].content = newContent;
+                localStorage.setItem('jjhStudyLogs', JSON.stringify(logs));
+                renderAll();
+            }
+        }
+
+        // --- 수정된 삭제 기능 (% 차감 포함) ---
+        function deleteLog(index) {
+            if (confirm("이 기록을 삭제하시겠습니까? 삭제 시 해당 공부로 얻은 역량 %도 함께 줄어듭니다.")) {
+                let logs = JSON.parse(localStorage.getItem('jjhStudyLogs'));
+                let mySkills = JSON.parse(localStorage.getItem('jjhSkills_vFinal'));
+
+                // 해당 로그가 가지고 있던 포인트만큼 차감
+                const lostPoints = logs[type][index].points || 0;
+                mySkills[type] = Math.max(10, mySkills[type] - lostPoints); // 최소 10% 유지
+
+                // 데이터 업데이트
+                logs[type].splice(index, 1);
+                localStorage.setItem('jjhStudyLogs', JSON.stringify(logs));
+                localStorage.setItem('jjhSkills_vFinal', JSON.stringify(mySkills));
+
+                alert(`기록이 삭제되었으며, 역량이 ${lostPoints}%만큼 줄어들었습니다. 🍏`);
+                renderAll();
+            }
+        }
+
+        function addComment() {
+            const user = localStorage.getItem('userId') || '익명';
+            const text = document.getElementById('comment-text').value;
+            if (!text.trim()) return;
+            let feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks')) || {};
+            if (!feedbacks[type]) feedbacks[type] = [];
+            feedbacks[type].push({ user: user, text: text });
+            localStorage.setItem('jjhFeedbacks', JSON.stringify(feedbacks));
+            document.getElementById('comment-text').value = '';
+            renderAll();
+        }
+        renderAll();
+    </script>
+</body>
+
+</html>

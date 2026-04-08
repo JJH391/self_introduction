@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>brat auth</title>
     <style>
-        /* --- 배경: Brat Grid --- */
         body {
             margin: 0;
             display: flex;
@@ -16,13 +15,10 @@
             font-family: Arial, sans-serif;
             font-weight: bold;
             background-color: #8ace00;
-            background-image:
-                linear-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+            background-image: linear-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
             background-size: 50px 50px;
         }
 
-        /* --- 뒤로가기 버튼 스타일 (왼쪽 상단) --- */
         .back-btn {
             position: fixed;
             top: 20px;
@@ -42,7 +38,6 @@
             color: black;
         }
 
-        /* --- 기존 인증 박스 스타일 유지 --- */
         .auth-container {
             background-color: black;
             color: white;
@@ -101,7 +96,6 @@
 
 <body>
     <a href="./index.html" class="back-btn">[ BACK ]</a>
-
     <div class="auth-container" id="login-box">
         <div class="auth-title">brat login</div>
         <input type="text" id="login-id" class="auth-input" placeholder="ID">
@@ -109,7 +103,6 @@
         <button class="auth-btn" onclick="handleLogin()">ENTER</button>
         <div class="toggle-text" onclick="toggleAuth()">계정이 없으면 회원가입 해</div>
     </div>
-
     <div class="auth-container" id="signup-box" style="display: none;">
         <div class="auth-title">brat signup</div>
         <input type="text" id="signup-id" class="auth-input" placeholder="NEW ID">
@@ -117,7 +110,6 @@
         <button class="auth-btn" onclick="handleSignup()">CREATE</button>
         <div class="toggle-text" onclick="toggleAuth()">이미 회원이면 로그인 해</div>
     </div>
-
     <script>
         function toggleAuth() {
             const lBox = document.getElementById('login-box');
@@ -125,34 +117,39 @@
             lBox.style.display = lBox.style.display === 'none' ? 'block' : 'none';
             sBox.style.display = sBox.style.display === 'none' ? 'block' : 'none';
         }
-
         function handleSignup() {
             const id = document.getElementById('signup-id').value;
             const pw = document.getElementById('signup-pw').value;
-            if (!id || !pw) return alert("빈칸을 다 채워줘! Very un-brat of you.");
-
+            if (!id || !pw) return alert("빈칸 채워!");
             let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
-            if (users[id]) return alert("이미 사용 중인 아이디야.");
-
-            users[id] = pw;
+            if (users[id] || id === 'jjh') return alert("이미 있는 아이디야.");
+            users[id] = { pw: pw, role: 'user' };
             localStorage.setItem('bratUsers', JSON.stringify(users));
-            alert("회원가입 완료! 이제 로그인 해.");
+            alert("회원가입 완료! 로그인 해.");
             toggleAuth();
         }
-
         function handleLogin() {
             const id = document.getElementById('login-id').value;
             const pw = document.getElementById('login-pw').value;
+            if (id === 'jjh' && pw === '091006.com!') {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', 'jjh');
+                localStorage.setItem('isAdmin', 'true');
+                localStorage.setItem('isSuperAdmin', 'true');
+                alert("MASTER ADMIN 로그인 완료.");
+                location.href = "./index.html";
+                return;
+            }
             let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
-
-            if (users[id] && users[id] === pw) {
+            if (users[id] && users[id].pw === pw) {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userId', id);
-                alert(`${id}님, brat 세계에 오신 걸 환영합니다.`);
+                if (users[id].role === 'admin') localStorage.setItem('isAdmin', 'true');
+                else localStorage.removeItem('isAdmin');
+                localStorage.removeItem('isSuperAdmin');
+                alert(`${id}님 환영합니다.`);
                 location.href = "./index.html";
-            } else {
-                alert("아이디나 비밀번호가 틀렸어.");
-            }
+            } else { alert("정보가 틀렸어."); }
         }
     </script>
 </body>

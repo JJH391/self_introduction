@@ -48,7 +48,6 @@
             outline: none;
         }
 
-        /* --- 게시판 스크롤 박스 --- */
         .board-container {
             max-height: 500px;
             overflow-y: auto;
@@ -93,6 +92,7 @@
             display: flex;
             gap: 10px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .write-btn {
@@ -105,17 +105,18 @@
             font-weight: bold;
         }
 
-        .write-btn:hover {
-            background-color: white;
-            color: black;
-        }
-
         .clear-btn {
             background-color: transparent;
             border: 2px solid black;
             padding: 10px 20px;
             cursor: pointer;
             font-weight: bold;
+        }
+
+        .admin-btn {
+            border-color: red !important;
+            color: red !important;
+            display: none;
         }
 
         .footer-link {
@@ -135,8 +136,8 @@
     <div class="main-content">
         <h1 class="board-title">Brat Board</h1>
         <div class="input-group">
-            <input type="text" id="post-title" placeholder="무슨 생각 해? (제목, 최대 100자)" maxlength="100">
-            <input type="text" id="post-author" placeholder="너 누구야? (작성자)">
+            <input type="text" id="post-title" placeholder="무슨 생각 해? (최대 100자)" maxlength="100">
+            <input type="text" id="post-author" placeholder="작성자">
             <button class="write-btn" onclick="addPost()">POST IT</button>
         </div>
         <div class="board-container">
@@ -155,11 +156,29 @@
         <div class="btn-container">
             <button class="clear-btn" onclick="deleteLastPost()">DELETE LAST</button>
             <button class="clear-btn" onclick="clearBoard()">CLEAR ALL</button>
+            <button id="admin-user-btn" class="clear-btn admin-btn" onclick="manageUsers()">USER MGMT</button>
         </div>
     </div>
     <a href="https://youtu.be/39RxXGcf9-E?si=d7fiXr0VFdIB1W8P" target="_blank" class="footer-link">brat</a>
     <script src="JS/navbar.js"></script>
     <script src="JS/board.js"></script>
+    <script>
+        if (localStorage.getItem('isAdmin') === 'true') {
+            document.getElementById('admin-user-btn').style.display = 'block';
+        }
+        function manageUsers() {
+            let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
+            let userList = Object.keys(users).join("\n");
+            const target = prompt("삭제할 유저 ID를 적어줘 (관리자 제외):\n\n" + (userList || "유저 없음"));
+            if (target && users[target]) {
+                if (confirm(`${target} 계정을 삭제할 거야?`)) {
+                    delete users[target];
+                    localStorage.setItem('bratUsers', JSON.stringify(users));
+                    alert("삭제 완료.");
+                }
+            } else if (target) alert("그런 유저는 없어.");
+        }
+    </script>
 </body>
 
 </html>
