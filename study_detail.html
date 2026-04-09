@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Study Detail - Feedback</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Detail - Feedback & Community</title>
     <style>
         body {
             background-color: #8ace00;
@@ -14,6 +15,7 @@
         }
 
         .container {
+            width: 95%;
             max-width: 800px;
             margin: 0 auto;
             background: rgba(0, 0, 0, 0.9);
@@ -21,6 +23,7 @@
             padding: 40px;
             border: 5px solid black;
             box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
         }
 
         h1 {
@@ -29,6 +32,7 @@
             border-bottom: 3px solid #8ace00;
             padding-bottom: 10px;
             margin-bottom: 30px;
+            font-size: 2rem;
         }
 
         .log-item {
@@ -40,173 +44,386 @@
             position: relative;
         }
 
-        .log-date {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 10px;
+        .log-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
         }
 
-        .admin-controls {
-            position: absolute;
-            top: 15px;
-            right: 15px;
+        /* 피드백 섹션 */
+        .feedback-section {
+            margin-top: 50px;
+            border-top: 1px solid #444;
+            padding-top: 30px;
+        }
+
+        .comment-input-group {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-input-group input {
+            flex: 1;
+            padding: 12px;
+            background: black;
+            border: 2px solid #8ace00;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-add {
+            background: #8ace00;
+            color: black;
+        }
+
+        .comment-card {
+            background: #222;
+            border: 1px solid #333;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #8ace00;
+            margin-bottom: 5px;
+        }
+
+        .comment-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+        }
+
+        .action-link {
+            color: #aaa;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .action-link:hover {
+            color: #8ace00;
+        }
+
+        .like-btn {
+            color: #ff4d4d;
+            cursor: pointer;
+        }
+
+        .reply-container {
+            margin-left: 20px;
+            margin-top: 10px;
+            border-left: 2px solid #444;
+            padding-left: 15px;
+        }
+
+        .reply-input-group {
+            margin-top: 10px;
             display: none;
             gap: 5px;
         }
 
-        .edit-btn {
-            background: #555;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .del-btn {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .feedback-section {
-            margin-top: 50px;
-            border-top: 1px solid #333;
-            padding-top: 30px;
-        }
-
-        .comment-input {
-            width: 75%;
-            padding: 12px;
-            background: black;
-            color: white;
-            border: 2px solid #8ace00;
-        }
-
-        .comment-btn {
-            padding: 12px 20px;
-            background: #8ace00;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .comment-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 30px;
-            text-align: left;
-        }
-
-        .comment-item {
-            border-bottom: 1px solid #222;
-            padding: 15px 0;
-            font-size: 16px;
-        }
-
-        .comment-user {
-            color: #8ace00;
-            margin-right: 10px;
-        }
-
         .back-link {
             display: inline-block;
-            margin-bottom: 20px;
-            color: white;
+            margin-top: 30px;
+            color: #8ace00;
             text-decoration: none;
-            font-size: 14px;
+        }
+
+        /* 반응형 모바일 설정 */
+        @media (max-width: 600px) {
+            body {
+                padding-top: 80px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .log-actions {
+                position: static;
+                margin-top: 10px;
+                justify-content: flex-end;
+            }
+
+            .comment-input-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* 반응형 컨테이너 보정 */
+        @media (max-width: 768px) {
+
+            .container,
+            .main-content {
+                width: 95% !important;
+                padding: 20px !important;
+                margin-top: 70px !important;
+            }
+
+            h1 {
+                font-size: 30px !important;
+            }
+
+            /* 테이블 가로 스크롤 대응 */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                min-width: 500px;
+                /* 테이블이 너무 찌그러지지 않게 최소 너비 유지 */
+            }
+
+            /* 버튼 배치 조정 */
+            .btn-container {
+                flex-direction: column;
+                display: flex;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <a href="./study.html" class="back-link">← BACK TO LIST</a>
         <h1 id="detail-title">STUDY LOG</h1>
-        <div id="log-container"></div>
+        <div id="log-list"></div>
 
         <div class="feedback-section">
-            <h3 style="color: #8ace00; text-align: left;">FEEDBACK</h3>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="comment-text" class="comment-input" placeholder="피드백을 남겨주세요!">
-                <button class="comment-btn" onclick="addComment()">SEND</button>
+            <h2 style="color: #8ace00;">FEEDBACKS</h2>
+            <div id="comment-form" class="comment-input-group">
+                <input type="text" id="comment-text" placeholder="로그인 후 피드백을 남겨주세요...">
+                <button class="btn btn-add" onclick="addComment()">POST</button>
             </div>
-            <ul id="comment-list" class="comment-list"></ul>
+            <div id="comment-list"></div>
         </div>
+
+        <a href="./study.html" class="back-link">← Back to Stats</a>
     </div>
 
     <script src="JS/navbar.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type') || 'html';
-        const isMaster = localStorage.getItem('userId') === 'jjh';
-        document.getElementById('detail-title').innerText = type.toUpperCase() + " STUDY LOG";
+        const currentUserId = localStorage.getItem('userId');
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
-        function renderAll() {
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('detail-title').innerText = `${type.toUpperCase()} STUDY LOGS`;
+            renderLogs();
+            renderComments();
+
+            if (!currentUserId) {
+                const input = document.getElementById('comment-text');
+                input.placeholder = "로그인이 필요한 기능입니다.";
+                input.disabled = true;
+            }
+        });
+
+        // 보안 검증 함수
+        function hasPermission(owner) {
+            return currentUserId === owner || isAdmin;
+        }
+
+        function renderLogs() {
             const logs = JSON.parse(localStorage.getItem('jjhStudyLogs')) || {};
-            const logContainer = document.getElementById('log-container');
+            const list = document.getElementById('log-list');
+            list.innerHTML = '';
 
-            logContainer.innerHTML = (logs[type] || []).map((log, index) => `
-                <div class="log-item">
-                    <div class="log-date">${log.date} (성장도: +${log.points}%)</div>
-                    <div id="log-text-${index}" style="font-size: 18px;">${log.content}</div>
-                    <div class="admin-controls" style="display: ${isMaster ? 'flex' : 'none'}">
-                        <button class="edit-btn" onclick="editLog(${index})">EDIT</button>
-                        <button class="del-btn" onclick="deleteLog(${index})">DEL</button>
+            if (!logs[type] || logs[type].length === 0) {
+                list.innerHTML = "<p>기록된 로그가 없습니다.</p>";
+                return;
+            }
+
+            logs[type].forEach((log, index) => {
+                const logTopic = log.topic || log.content || log.text || '내용 없음';
+                const div = document.createElement('div');
+                div.className = 'log-item';
+                div.innerHTML = `
+                    <div style="color:#8ace00; font-size:12px;">${log.date} (+${log.points}%)</div>
+                    <div style="margin-top:10px;">${logTopic}</div>
+                    <div class="log-actions">
+                        <span class="action-link" onclick="editLog(${index})">수정</span>
+                        <span class="action-link" style="color:#ff4d4d;" onclick="deleteLog(${index})">삭제</span>
                     </div>
-                </div>
-            `).reverse().join('') || "<p style='color:#555;'>기록된 공부 내용이 없습니다.</p>";
-
-            const feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks')) || {};
-            const commentList = document.getElementById('comment-list');
-            commentList.innerHTML = (feedbacks[type] || []).map(f => `<li class="comment-item"><span class="comment-user">[${f.user}]</span> ${f.text}</li>`).reverse().join('');
+                `;
+                list.appendChild(div);
+            });
         }
 
         function editLog(index) {
+            if (!hasPermission('jjh')) return alert("마스터만 수정 가능합니다.");
             let logs = JSON.parse(localStorage.getItem('jjhStudyLogs'));
-            const newContent = prompt("내용을 수정하세요:", logs[type][index].content);
-            if (newContent && newContent.trim() !== "") {
-                logs[type][index].content = newContent;
-                localStorage.setItem('jjhStudyLogs', JSON.stringify(logs));
-                renderAll();
-            }
+            let mySkills = JSON.parse(localStorage.getItem('jjhSkills_vFinal'));
+            const log = logs[type][index];
+
+            const newTopic = prompt("내용 수정:", log.topic || log.content || log.text);
+            if (!newTopic) return;
+
+            mySkills[type] = Math.max(10, mySkills[type] - log.points);
+            let newPts = newTopic.length > 30 ? 5 : (newTopic.length > 10 ? 3 : 1);
+
+            logs[type][index].topic = newTopic;
+            logs[type][index].points = newPts;
+            mySkills[type] = Math.min(100, mySkills[type] + newPts);
+
+            localStorage.setItem('jjhStudyLogs', JSON.stringify(logs));
+            localStorage.setItem('jjhSkills_vFinal', JSON.stringify(mySkills));
+            renderLogs();
         }
 
-        // --- 수정된 삭제 기능 (% 차감 포함) ---
         function deleteLog(index) {
-            if (confirm("이 기록을 삭제하시겠습니까? 삭제 시 해당 공부로 얻은 역량 %도 함께 줄어듭니다.")) {
-                let logs = JSON.parse(localStorage.getItem('jjhStudyLogs'));
-                let mySkills = JSON.parse(localStorage.getItem('jjhSkills_vFinal'));
+            if (!hasPermission('jjh')) return alert("권한이 없습니다.");
+            if (!confirm("삭제하시겠습니까?")) return;
 
-                // 해당 로그가 가지고 있던 포인트만큼 차감
-                const lostPoints = logs[type][index].points || 0;
-                mySkills[type] = Math.max(10, mySkills[type] - lostPoints); // 최소 10% 유지
+            let logs = JSON.parse(localStorage.getItem('jjhStudyLogs'));
+            let mySkills = JSON.parse(localStorage.getItem('jjhSkills_vFinal'));
 
-                // 데이터 업데이트
-                logs[type].splice(index, 1);
-                localStorage.setItem('jjhStudyLogs', JSON.stringify(logs));
-                localStorage.setItem('jjhSkills_vFinal', JSON.stringify(mySkills));
+            mySkills[type] = Math.max(10, mySkills[type] - (logs[type][index].points || 0));
+            logs[type].splice(index, 1);
 
-                alert(`기록이 삭제되었으며, 역량이 ${lostPoints}%만큼 줄어들었습니다. 🍏`);
-                renderAll();
-            }
+            localStorage.setItem('jjhStudyLogs', JSON.stringify(logs));
+            localStorage.setItem('jjhSkills_vFinal', JSON.stringify(mySkills));
+            renderLogs();
+        }
+
+        function renderComments() {
+            const feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks')) || {};
+            const list = document.getElementById('comment-list');
+            list.innerHTML = '';
+            if (!feedbacks[type]) feedbacks[type] = [];
+
+            feedbacks[type].forEach((cmt, idx) => {
+                const card = document.createElement('div');
+                card.className = 'comment-card';
+                card.innerHTML = `
+                    <div class="comment-header"><span>${cmt.user}</span><span>${cmt.date || ''}</span></div>
+                    <div class="comment-text">${cmt.text}</div>
+                    <div class="comment-actions">
+                        <span class="like-btn" onclick="toggleLike(${idx})">♥ ${cmt.likes || 0}</span>
+                        <span class="action-link" onclick="showReplyForm(${idx})">답글</span>
+                        ${hasPermission(cmt.user) ? `<span class="action-link" onclick="editComment(${idx})">수정</span>` : ''}
+                        ${hasPermission(cmt.user) ? `<span class="action-link" onclick="deleteComment(${idx})">삭제</span>` : ''}
+                    </div>
+                    <div id="reply-form-${idx}" class="reply-input-group">
+                        <input type="text" id="reply-text-${idx}" placeholder="답글 입력...">
+                        <button class="btn btn-add" onclick="addReply(${idx})">OK</button>
+                    </div>
+                    <div class="reply-container">${renderReplies(cmt.replies, idx)}</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function renderReplies(replies, pIdx) {
+            if (!replies) return '';
+            return replies.map((re, rIdx) => `
+                <div style="font-size:14px; margin-bottom:5px;">
+                    <span style="color:#8ace00;">ㄴ ${re.user}:</span> ${re.text}
+                    ${hasPermission(re.user) ? `<span class="action-link" style="font-size:10px; margin-left:5px;" onclick="deleteReply(${pIdx}, ${rIdx})">삭제</span>` : ''}
+                </div>
+            `).join('');
         }
 
         function addComment() {
-            const user = localStorage.getItem('userId') || '익명';
-            const text = document.getElementById('comment-text').value;
-            if (!text.trim()) return;
+            if (!currentUserId) return;
+            const text = document.getElementById('comment-text').value.trim();
+            if (!text) return;
+
             let feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks')) || {};
             if (!feedbacks[type]) feedbacks[type] = [];
-            feedbacks[type].push({ user: user, text: text });
+
+            feedbacks[type].push({
+                user: currentUserId, text: text,
+                date: new Date().toLocaleDateString(),
+                likes: 0, replies: []
+            });
             localStorage.setItem('jjhFeedbacks', JSON.stringify(feedbacks));
             document.getElementById('comment-text').value = '';
-            renderAll();
+            renderComments();
         }
-        renderAll();
+
+        function toggleLike(idx) {
+            if (!currentUserId) return alert("로그인 후 이용 가능합니다.");
+            let feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks'));
+            feedbacks[type][idx].likes = (feedbacks[type][idx].likes || 0) + 1;
+            localStorage.setItem('jjhFeedbacks', JSON.stringify(feedbacks));
+            renderComments();
+        }
+
+        function showReplyForm(idx) {
+            if (!currentUserId) return alert("로그인하세요.");
+            const form = document.getElementById(`reply-form-${idx}`);
+            form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function addReply(idx) {
+            const text = document.getElementById(`reply-text-${idx}`).value.trim();
+            if (!text) return;
+            let feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks'));
+            feedbacks[type][idx].replies.push({ user: currentUserId, text: text });
+            localStorage.setItem('jjhFeedbacks', JSON.stringify(feedbacks));
+            renderComments();
+        }
+
+        function editComment(idx) {
+            let feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks'));
+            if (!hasPermission(feedbacks[type][idx].user)) return;
+            const newText = prompt("수정 내용:", feedbacks[type][idx].text);
+            if (newText) {
+                feedbacks[type][idx].text = newText;
+                localStorage.setItem('jjhFeedbacks', JSON.stringify(feedbacks));
+                renderComments();
+            }
+        }
+
+        function deleteComment(idx) {
+            if (!confirm("삭제하시겠습니까?")) return;
+            let feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks'));
+            if (!hasPermission(feedbacks[type][idx].user)) return;
+            feedbacks[type].splice(idx, 1);
+            localStorage.setItem('jjhFeedbacks', JSON.stringify(feedbacks));
+            renderComments();
+        }
+
+        function deleteReply(pIdx, rIdx) {
+            let feedbacks = JSON.parse(localStorage.getItem('jjhFeedbacks'));
+            if (!hasPermission(feedbacks[type][pIdx].replies[rIdx].user)) return;
+            feedbacks[type][pIdx].replies.splice(rIdx, 1);
+            localStorage.setItem('jjhFeedbacks', JSON.stringify(feedbacks));
+            renderComments();
+        }
     </script>
 </body>
 

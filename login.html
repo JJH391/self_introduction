@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>brat auth</title>
+    <title>brat auth - Secure</title>
     <style>
         body {
             margin: 0;
@@ -33,104 +33,167 @@
             z-index: 1001;
         }
 
-        .back-btn:hover {
-            background-color: white;
-            color: black;
-        }
-
         .auth-container {
-            background-color: black;
-            color: white;
+            background-color: white;
             padding: 40px;
-            border: 4px solid black;
-            width: 350px;
-            text-align: center;
-            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
-        }
-
-        .auth-title {
-            font-size: 30px;
-            margin-bottom: 30px;
-            color: #8ace00;
-            text-transform: lowercase;
-            font-style: italic;
-        }
-
-        .auth-input {
+            border: 5px solid black;
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.2);
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: none;
+            max-width: 400px;
+            /* 반응형 핵심 */
             box-sizing: border-box;
-            font-weight: bold;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 30px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 3px solid black;
             font-size: 16px;
-            outline: none;
+            font-weight: bold;
+            box-sizing: border-box;
         }
 
         .auth-btn {
             width: 100%;
-            padding: 12px;
-            background-color: #8ace00;
-            color: black;
+            padding: 15px;
+            background-color: black;
+            color: white;
             border: none;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 10px;
+            transition: 0.3s;
         }
 
         .auth-btn:hover {
-            background-color: white;
+            background-color: #333;
         }
 
-        .toggle-text {
-            font-size: 12px;
-            color: #8ace00;
-            cursor: pointer;
+        .toggle-link {
+            margin-top: 20px;
+            display: block;
+            color: black;
             text-decoration: underline;
-            margin-top: 10px;
-            display: inline-block;
+            cursor: pointer;
+        }
+
+        /* 반응형 미디어 쿼리 */
+        @media (max-width: 480px) {
+            .auth-container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .back-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+
+        /* 반응형 컨테이너 보정 */
+        @media (max-width: 768px) {
+
+            .container,
+            .main-content {
+                width: 95% !important;
+                padding: 20px !important;
+                margin-top: 70px !important;
+            }
+
+            h1 {
+                font-size: 30px !important;
+            }
+
+            /* 테이블 가로 스크롤 대응 */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                min-width: 500px;
+                /* 테이블이 너무 찌그러지지 않게 최소 너비 유지 */
+            }
+
+            /* 버튼 배치 조정 */
+            .btn-container {
+                flex-direction: column;
+                display: flex;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <a href="./index.html" class="back-btn">[ BACK ]</a>
-    <div class="auth-container" id="login-box">
-        <div class="auth-title">brat login</div>
-        <input type="text" id="login-id" class="auth-input" placeholder="ID">
-        <input type="password" id="login-pw" class="auth-input" placeholder="PASSWORD">
+    <a href="./index.html" class="back-btn">← BACK</a>
+
+    <div id="login-section" class="auth-container">
+        <h2>LOGIN</h2>
+        <input type="text" id="login-id" placeholder="ID">
+        <input type="password" id="login-pw" placeholder="PASSWORD">
         <button class="auth-btn" onclick="handleLogin()">ENTER</button>
-        <div class="toggle-text" onclick="toggleAuth()">계정이 없으면 회원가입 해</div>
+        <span class="toggle-link" onclick="toggleAuth()">아직 회원이 아니야? (JOIN)</span>
     </div>
-    <div class="auth-container" id="signup-box" style="display: none;">
-        <div class="auth-title">brat signup</div>
-        <input type="text" id="signup-id" class="auth-input" placeholder="NEW ID">
-        <input type="password" id="signup-pw" class="auth-input" placeholder="NEW PASSWORD">
-        <button class="auth-btn" onclick="handleSignup()">CREATE</button>
-        <div class="toggle-text" onclick="toggleAuth()">이미 회원이면 로그인 해</div>
+
+    <div id="join-section" class="auth-container" style="display: none;">
+        <h2>JOIN US</h2>
+        <input type="text" id="join-id" placeholder="NEW ID">
+        <input type="password" id="join-pw" placeholder="NEW PASSWORD">
+        <button class="auth-btn" onclick="handleJoin()">CREATE ACCOUNT</button>
+        <span class="toggle-link" onclick="toggleAuth()">이미 계정이 있어? (LOGIN)</span>
     </div>
+
     <script>
-        function toggleAuth() {
-            const lBox = document.getElementById('login-box');
-            const sBox = document.getElementById('signup-box');
-            lBox.style.display = lBox.style.display === 'none' ? 'block' : 'none';
-            sBox.style.display = sBox.style.display === 'none' ? 'block' : 'none';
+        // 보안: 특수문자 및 공백 필터링 (XSS 및 주입 공격 방지)
+        function validateInput(str) {
+            const re = /[<>{}[]\\\/ ]/g;
+            return !re.test(str);
         }
-        function handleSignup() {
-            const id = document.getElementById('signup-id').value;
-            const pw = document.getElementById('signup-pw').value;
-            if (!id || !pw) return alert("빈칸 채워!");
+
+        function toggleAuth() {
+            const loginSection = document.getElementById('login-section');
+            const joinSection = document.getElementById('join-section');
+            if (loginSection.style.display === 'none') {
+                loginSection.style.display = 'block';
+                joinSection.style.display = 'none';
+            } else {
+                loginSection.style.display = 'none';
+                joinSection.style.display = 'block';
+            }
+        }
+
+        function handleJoin() {
+            const id = document.getElementById('join-id').value.trim();
+            const pw = document.getElementById('join-pw').value.trim();
+
+            if (!id || !pw) return alert("빈칸을 채워줘.");
+            if (!validateInput(id) || !validateInput(pw)) return alert("아이디나 비밀번호에 특수문자/공백은 쓸 수 없어.");
+
             let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
             if (users[id] || id === 'jjh') return alert("이미 있는 아이디야.");
+
             users[id] = { pw: pw, role: 'user' };
             localStorage.setItem('bratUsers', JSON.stringify(users));
-            alert("회원가입 완료! 로그인 해.");
+            alert("회원가입 완료! 이제 로그인해.");
             toggleAuth();
         }
+
         function handleLogin() {
-            const id = document.getElementById('login-id').value;
-            const pw = document.getElementById('login-pw').value;
+            const id = document.getElementById('login-id').value.trim();
+            const pw = document.getElementById('login-pw').value.trim();
+
+            if (!validateInput(id) || !validateInput(pw)) return alert("허용되지 않은 문자가 포함되어 있어.");
+
+            // MASTER ADMIN 체크 (보안: 로직 내 직접 비교)
             if (id === 'jjh' && pw === '091006.com!') {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userId', 'jjh');
@@ -140,6 +203,7 @@
                 location.href = "./index.html";
                 return;
             }
+
             let users = JSON.parse(localStorage.getItem('bratUsers')) || {};
             if (users[id] && users[id].pw === pw) {
                 localStorage.setItem('isLoggedIn', 'true');
@@ -149,7 +213,9 @@
                 localStorage.removeItem('isSuperAdmin');
                 alert(`${id}님 환영합니다.`);
                 location.href = "./index.html";
-            } else { alert("정보가 틀렸어."); }
+            } else {
+                alert("정보가 틀렸어.");
+            }
         }
     </script>
 </body>

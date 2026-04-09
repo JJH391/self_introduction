@@ -125,6 +125,39 @@
             color: black;
             cursor: pointer;
         }
+
+        /* 반응형 컨테이너 보정 */
+        @media (max-width: 768px) {
+
+            .container,
+            .main-content {
+                width: 95% !important;
+                padding: 20px !important;
+                margin-top: 70px !important;
+            }
+
+            h1 {
+                font-size: 30px !important;
+            }
+
+            /* 테이블 가로 스크롤 대응 */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                min-width: 500px;
+                /* 테이블이 너무 찌그러지지 않게 최소 너비 유지 */
+            }
+
+            /* 버튼 배치 조정 */
+            .btn-container {
+                flex-direction: column;
+                display: flex;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 
